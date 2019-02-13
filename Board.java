@@ -7,7 +7,7 @@ import java.util.Iterator;
  */
 
 public class Board{
-	int neighboursCalled = 0;
+	//int neighboursCalled = 0;
 	int N = 0; 												// Size for N x N board
 	
 	int[][] solutionBoard = {{1,2,3},{4,5,6},{7,8,0}};		// Board to reach
@@ -105,26 +105,7 @@ public class Board{
     }
     
     public boolean equals( Object o){
-        // YOUR CODE HERE
-    	/*
-    	// Date and Transaction examples off Princeton FAQ
-    	
-        if (other == this) return true;
-        if (other == null) return false;
-        if (other.getClass() != this.getClass()) return false;
-        Transaction that = (Transaction) other;
-        return (this.amount == that.amount) && (this.who.equals(that.who))
-                                            && (this.when.equals(that.when));
-    	
-
-        if (other == this) return true;
-        if (other == null) return false;
-        if (other.getClass() != this.getClass()) return false;
-        Date that = (Date) other;
-        return (this.month == that.month) && (this.day == that.day) && (this.year == that.year);
-        */
-
-    	
+        // YOUR CODE HERE    	    	
         if (o == this) return true;
         if (o == null) return false;
         if (o.getClass() != this.getClass()) return false;
@@ -139,7 +120,6 @@ public class Board{
     public void copyBoard(int[][] boardA, int[][] boardB) {
         for (int i = 0; i < N; i++){
         	for (int j = 0; j < N; j++) {
-        		//boardA.board[i][j] = boardB.board[i][j];	// make boards the same
         		boardA[i][j] = boardB[i][j];
         	}
         }
@@ -147,8 +127,8 @@ public class Board{
 
     //public Iterable<Board> neighbours(Queue<Board> q){  
     public Iterable<Board> neighbours(){  
-    	neighboursCalled++;
-    	System.out.println("Neighbours: " + neighboursCalled);
+    	//neighboursCalled++;
+    	//System.out.println("Neighbours: " + neighboursCalled);
     //public Iterable<Board> neighbours(){    	
         // YOUR CODE HERE   
 		//MaxPQ<Board> boardList = new MaxPQ();
@@ -203,27 +183,9 @@ public class Board{
 	    				//if(checkBoard(board1, q)) {
 		    			if(checkBoard(board1)) {
 	    					boardQueue.enqueue(board1);
-		    				System.out.println("\nMove Left:");
-		    				System.out.println(board1.toString());
+		    				//System.out.println("\nMove Left:");
+		    				//System.out.println(board1.toString());
 	    				}
-
-	    				//System.out.println("board1 hamming: " + board1.hamming());
-	    				//System.out.println("board1 manhattan: " + board1.manhattan());
-
-	    		        //key = (Key[]) new Comparable[board1.manhattan()];
-	    		        
-	    				//boardQueue.insert(board1);
-	    		    	//System.out.println("size of boardQueue: " + boardQueue.size());
-	    				//System.out.println(board1.toString());
-	    				
-	    				//System.out.println("test");
-	    				//System.out.println(boardQueue[0].toString());
-
-	    				//System.out.println("delMin() index: " + boardQueue.delMin());
-	    				//System.out.println(boardQueue.delMin().toString());		// Dequeue the board with the minimum priority
-
-	    				//boardQueue.enqueue(board1);
-	    				//System.out.println("boardQueue size: " + boardQueue.size());
 	    			}	    			
 	    			if (x < N - 1) {												// Can move blank tile right (change to N-1, out of bounds error)
 	    				//System.out.println("\nMove Right:");
@@ -233,15 +195,10 @@ public class Board{
 
 	    				//Board board0 = new Board(board);
 	    				Board board2 = new Board(b2);
-	    		    	//System.out.println("size of boardQueue: " + boardQueue.size());
-	    				//System.out.println("Board 0");
-	    				//System.out.println(board2.toString());
-
-	    				//if(checkBoard(board2, q)) {
 		    			if(checkBoard(board2)) {
 	    					boardQueue.enqueue(board2);
-		    				System.out.println("\nMove Right:");
-		    				System.out.println(board2.toString());
+		    				//System.out.println("\nMove Right:");
+		    				//System.out.println(board2.toString());
 	    				}
 	    			}	    			
 	    			if (y > 0) {												// Can move blank tile up
@@ -255,8 +212,8 @@ public class Board{
 	    				//if(checkBoard(board3, q)) {
 		    			if(checkBoard(board3)) {
 	    					boardQueue.enqueue(board3);
-		    				System.out.println("\nMove Up:");
-		    				System.out.println(board3.toString());
+		    				//System.out.println("\nMove Up:");
+		    				//System.out.println(board3.toString());
 	    				}  				
 	    			}	    			
 	    			if (y < N - 1) {												// Can move blank tile down (change to N-1, out of bounds error)
@@ -273,12 +230,12 @@ public class Board{
 	    				//if(checkBoard(board4, q)) {
 		    			if(checkBoard(board4)) {
 	    					boardQueue.enqueue(board4);
-		    				System.out.println("\nMove Down:");
-		    				System.out.println(board4.toString());
+		    				//System.out.println("\nMove Down:");
+		    				//System.out.println(board4.toString());
 	    				}
 	    			}
 	    			
-    				System.out.println("size of boardQueue " + boardQueue.size());
+    				//System.out.println("size of boardQueue " + boardQueue.size());
 	    		}
 	    	}
 	    }
@@ -334,7 +291,12 @@ public class Board{
 	    	for (int j = 0; j < N; j++){
 	    		//System.out.print(" " + board[i][j]);
 	    		//if (j<2) System.out.print(" |");
-	    		boardStr += " " + board[i][j];
+	    		if (board[i][j] != 0) {
+	    			boardStr += board[i][j] + " ";
+	    		}
+	    		else {
+	    			boardStr += "  ";
+	    		}
 	    		//if (j < N - 1) boardStr += (" |");
 	    	}
 	    	/*
@@ -357,49 +319,6 @@ public class Board{
         return boardStr;										// String representation of the board
     }
     
-    public static void main(String [] args){
-        
-        int[][] test1 = {{8,1,3},{4,0,2},{7,6,5}};	// 5 out of position (blank tile not included)
-
-        int[][] test2 = {{1,2,3},{4,5,6},{7,8,0}};	// 0 out of position
-        
-        //System.out.println(" x = 3, y = 2 test1[2][3]: " + test1[1][2]); // Test board[y][x] positions for x and y, i = y, j = x
-
-      //  MinPQ<Board> pq = new MinPQ<Board>();
-        
-		Board board1 = new Board(test1);
-		Board board2 = new Board(test2);
-		
-		//pq.insert(board1);
-		//pq.insert(board2);
-		
-		//int size = pq.size();	// error
-		
-		//System.out.println("MinPQ size: " + size);	// error
-		
-		/*
-		//Board board3 = new Board({{1,2,3},{4,5,6},{7,8,0}});
-		//Board board3 = new Board({1,2,3,4,5,6,7,8,0});
-		//Board board3 = new Board(1,2,3,4,5,6,7,8,0);
-		
-       // board1.hamming(test1);
-        //board2.hamming(test2);    
-        //board1.toString();
-        //board2.toString();
-		*/
-		
-        System.out.println(board1.toString());
-        System.out.println(board2.toString());
-        //System.out.println("Board 1 Hamming: " + board1.hamming());
-        //System.out.println("Board 2 Hamming: " + board2.hamming());
-        
-        //System.out.println("Board 1 Manhattan Distance: " + board1.manhattan());
-        
-        //board1.copyboard(board1,board2);
-       // System.out.println(board1.toString());
-        //System.out.println(board2.toString());
-        
-    }
 }
 
         

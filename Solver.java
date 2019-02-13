@@ -1,3 +1,10 @@
+/*
+ * Joe O'Regan
+ * K00203642
+ * 
+ * Works if the 0 or blank tile is up to 4 positions out of place, 
+ * but otherwise it's fairly broken, and gets stuck in a loop
+ */
 import java.util.Comparator;
 import java.util.*;
 
@@ -6,10 +13,12 @@ public class Solver {
 	Queue<State> doneQ = new Queue<>();
 	int minNumMoves = 0;
 	State solutionState;
-	// Moved from Board class
-	//Queue<Board> allBoardsQ = new Queue<Board>();	// store all boards visited on a queue
-	//Queue<Board> allBoardsQ = new Queue<>();	// store all boards visited on a queue
+	int test = 0;
+	int statesEnqueued = 0;
 	
+	/*
+	 * State with board layout, the number of moves, and the previous state (initial state has null for prevState)
+	 */
 	private class State implements Comparator<State>, Comparable<State>{
 		Board board;
 		int moves;
@@ -23,7 +32,10 @@ public class Solver {
 			prevState = s;
 		}
 
-		// Overriding the compareTo method (https://www.tutorialspoint.com/java/java_using_comparator.htm)
+		/*
+		 *  Overriding the compareTo method (https://www.tutorialspoint.com/java/java_using_comparator.htm)(non-Javadoc)
+		 * @see java.lang.Comparable#compareTo(java.lang.Object) // I don't know where this came from
+		 */
 		public int compareTo(State s1) {
 		      //return (this.prevState.board.manhattan()).compareTo(s1.prevState.board.manhattan());	// gives dereferenced error
 		      //return (this.prevState).compareTo(s1.prevState);	// gives dereferenced error
@@ -40,21 +52,11 @@ public class Solver {
     	State tempState;    	
     	statePQ = new MinPQ<State>();
     	boolean foundSolution = false;
-    	
-    	//Queue<State> doneQ = new Queue<>();
-    	
+    	    	
     	State initialState = new State(initial, null);   
     	initialState.moves = 0;
 
-    	//doneQ.enqueue(initialState);
-    	//doneQ.enqueue(initialState);
-    	doneQ.enqueue(initialState);
-    	//System.out.println("doneQ " + doneQ.size());// not adding more than 1 to queue
-    	//allBoardsQ.enqueue(initialState.board);	// add initial board to queue of boards    	
-    	//allBoardsQ.enqueue(initialState.board);	// add initial board to queue of boards
-    	//allBoardsQ.enqueue(initialState.board);	// add initial board to queue of boards CHECK ADDING TO QUEUE
-    	//System.out.println("allB " + allBoardsQ.size());// not adding more than 1 to queue
-    	
+    	doneQ.enqueue(initialState);    	
     	statePQ.insert(initialState);
     	
         while(!foundSolution) {
@@ -68,88 +70,59 @@ public class Solver {
         	if (!foundSolution){
 		        //for(Board b : tempState.board.neighbours(allBoards)) {  
 			    for(Board b : tempState.board.neighbours()) {        							// for each board that's a neighbour of the current board		
-		        	if(tempState.prevState == null || !b.equals(tempState.prevState.board)) {	// board isn't equal to the board for the previous state
+		        	if(tempState.prevState == null || !b.equals(tempState.prevState.board) || !checkStateBoard(b)) {	// board isn't equal to the board for the previous state
 		        		State s = new State(b, tempState);										// create new state	
-		        		boolean boardExpandedAlready = false;
-		        		//if (checkStateBoard(s.board, allBoardsQ)) statePQ.insert(s);	
-		        		
-		        		// DEEP COPY THE QUEUE
-		        		//if (checkStateBoard(s.board)) {
-		        		//Queue<State> checkBoards = new Queue<>(doneQ);
-		        		Queue<State> checkBoards = new Queue<>();
-		        		Iterator<State> iter = doneQ.iterator();
-		        		while(iter.hasNext()){
-		        			checkBoards.enqueue(iter.next());		   // Deep copy the queue     			
-		        		}
-		        		//checkBoards.enqueue(doneQ);		        		
-		        		
-	        			//System.out.println("2 doneQ size: " + doneQ.size());
-		    	    	
-		    	    	while (!checkBoards.isEmpty() && !boardExpandedAlready){
-		    	    		Board checkThis = checkBoards.dequeue().board;	// check each board on the queue
-		    	    		
-		    	    		if(checkThis.boardsAreEqual(checkThis.board, b.board)) {// if they are equal (already on the queue)
-		    	    			boardExpandedAlready = true;						// return false, and don't bother adding it
-		    	    			break;
-		    	    		}
-		    	    	}		
-		    	    	
-	        			System.out.println("3 doneQ size: " + doneQ.size());    	    	
-		    	    	
-		        		if(!boardExpandedAlready) {
+		        				        		  			    	    	
+		        		if(checkStateBoard(s.board)) {
 		        			statePQ.insert(s);
+		        	    	statesEnqueued++;													// Number of states on the queue
 		        			doneQ.enqueue(s);
-		        			//System.out.println("allBoardsQ size: " + allBoardsQ.size());
-		        			//System.out.println("4 doneQ size: " + doneQ.size());
 		        		}
-		        		
-		        		System.out.println("statePQ: " + statePQ.size());
-		        		
-		        		
+		        				        		
 		        		if(s.board.boardIsSolution()) {
 		            		solutionState = s;													// set the solution state to as the current state
 		            		foundSolution = true;												// finished / exit function
-		        		}
-		        		//System.out.println("\nQueue size: " + statePQ.size());
+		        		}	
+		        		//System.out.println("test " + ++test);
+		        		//System.out.println("DoneQ :" + doneQ.size());	        		
 		        	}
 		        }
         	}
     	}
     } 
 
+    /*
+     * Check if the board has been added to the visited boards queue already
+     */
     //public boolean checkStateBoard(Board b, Queue<Board> allBoards1){
     public boolean checkStateBoard(Board b){
 		//if (allBoardsQ.isEmpty()) {			
-		if (doneQ.isEmpty()) {							// If the queue of all previous boards is empty, board can be added
+		if (doneQ.isEmpty()) {											// If the queue of all previous boards is empty, board can be added
 			return true;
 		}
-		else {
-	    	//Queue<Board> checkBoards = allBoardsQ;
-	    	//Queue<State> checkBoards = doneQ;
-	    	Queue<State> checkBoards = new Queue<>();
-		    Iterator<State> blah = doneQ.iterator();
-		    while(blah.hasNext()){
-		    	checkBoards.enqueue(blah.next());
-		    }
-	    	
-	    	while (!checkBoards.isEmpty()){
-	    		Board checkThis = checkBoards.dequeue().board;			// check each board on the queue
-	    		
-	    		if(checkThis.boardsAreEqual(checkThis.board, b.board)) {// if they are equal (already on the queue)
-	    			return false;										// return false, and don't bother adding it
-	    		}
-	    	}
-			//System.out.println("test 3");
-			//if (putOnQueue) 
-			//allBoards.enqueue(b);						// Add the board to the previously visited boards queue				
-		}
-		//System.out.println("allBoards1 size: " + allBoards1.size());
-		//allBoardsQ.enqueue(b);								// Add the board to the previously visited boards queue		
-		//System.out.println("allBoardsQ size: " + allBoardsQ.size());
+		
+    	Queue<State> checkBoards = new Queue<>();					// Copy the visited states queue
+	    Iterator<State> it = doneQ.iterator();
+	    while(it.hasNext()){
+	    	checkBoards.enqueue(it.next());
+	    }
+    	
+    	while (!checkBoards.isEmpty()){
+    		Board checkThis = checkBoards.dequeue().board;			// check each board on the queue
+    		
+    		if(checkThis.boardsAreEqual(checkThis.board, b.board)) {// if they are equal (already on the queue)
+    			//System.out.println("Board is on queue already");
+    			
+    			return false;										// return false, and don't bother adding it	    			
+    		}
+    	}			
+
+		//System.out.println("Board is NOT on queue already");
 		
     	return true;										// if the board is not already on the boards list, return true to add it
     }
-       
+    
+    
     public boolean isSolvable() {
         // YOUR CODE HERE
     	// Don't need
@@ -188,21 +161,31 @@ public class Solver {
     
     /*
      * Create a list of the board states/tile moves from initial state to goal state
+     * (Probably should use a stack instead of a queue)
      */
     public Iterable<Board> solution() {
         // YOUR CODE HERE
     	// Stack/queue/priQ/linkedlist?
-    	Queue<Board> anotherQueue = new Queue<Board>();				// Hold the boards
+    	//Queue<Board> anotherQueue = new Queue<Board>();				// Hold the boards
+    	Stack<Board> solutionMovesMade = new Stack<Board>();			// Hold the boards
     	
     	State trackState = solutionState;							// Make the current state the final state
-    	anotherQueue.enqueue(trackState.board);						// Add the board for the current state to the list of boards
-    	    	
+    	//anotherQueue.enqueue(trackState.board);						// Add the board for the current state to the list of boards
+    	solutionMovesMade.push(trackState.board);
+    	/*
     	while(trackState.prevState != null){						// Unit the initial state is reached
     		anotherQueue.enqueue(trackState.prevState.board);		// Add boards to the queue for the previous state
     		trackState = trackState.prevState;						// Make the current state the previous state
     	}
+    	*/
     	
-        return anotherQueue;										// Return the list of boards used to reach the solution
+    	while (trackState.prevState != null){
+    		solutionMovesMade.push(trackState.prevState.board);
+    		trackState = trackState.prevState;
+    	}
+    	
+        //return anotherQueue;										// Return the list of boards used to reach the solution
+    	return solutionMovesMade;
     }
     
     public static void main(String[] args) {
@@ -225,10 +208,12 @@ public class Solver {
             System.out.println(board);
         }
         
+        System.out.println("Number of states enqueued = " + solver.statesEnqueued);
+        
         if(!solver.isSolvable())
             System.out.println("No solution possible");
         else
-            System.out.println("Mininimum number of moves = " + solver.moves());
+            System.out.println("Minimum number of moves = " + solver.moves());
     }
     /*
      //System.out.println("Board Solution: \n");
